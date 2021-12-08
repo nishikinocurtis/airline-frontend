@@ -1,12 +1,17 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Column} from "@ant-design/charts";
-import {Card, Divider, Typography} from "antd";
+import {Card, Divider, Typography, DatePicker} from "antd";
+import moment from "moment";
+import {viewCustomersByCommission, viewCustomersByNumber} from "../../lib/requests";
+import {dateTimeFormat} from "../../lib/dateFormat";
 
 const {Title} = Typography;
+const {RangePicker} = DatePicker;
 
-export default function TopCustomerChart() {
+export default function TopCustomerChart(props) {
     const [customerTicketCount, setCustomerTicketCount] = useState(null);
     const [customerCommission, setCustomerCommission] = useState(null);
+
 
     // for testing ONLY
     const testTicket = [
@@ -55,8 +60,8 @@ export default function TopCustomerChart() {
     ]
 
     const columnConfig = {
-        xField: 'uid',
-        yField: 'sum',
+        xField: 'key',
+        yField: 'value',
         seriesField: '',
         columnWidthRatio: 0.5,
         label: {
@@ -74,17 +79,74 @@ export default function TopCustomerChart() {
         },
     }
 
+    const handleDateRangeChange = (callback) => (value) => {
+        callback(value);
+    }
+
+    const viewTopCustomerNumber = (values) => {
+        viewCustomersByNumber(props.username,
+            values[0].startOf('day').format(dateTimeFormat),
+            values[1].endOf('day').format(dateTimeFormat)).then((response) => {
+                if (response.status == '200') {
+                    return response.data
+                }
+                return [];
+        }).then((response) => {
+            console.log(response)
+            let tableValue = response.map((item) => {
+                return {
+                    key: item.key,
+                    value: item.value ?? 0
+                }
+            })
+            setCustomerTicketCount(tableValue)
+        })
+    }
+    const viewTopCustomerCommission = (values) => {
+        viewCustomersByCommission(props.username,
+            values[0].startOf('day').format(dateTimeFormat),
+            values[1].endOf('day').format(dateTimeFormat)).then((response) => {
+            if (response.status == '200') {
+                return response.data
+            }
+            return [];
+        }).then((response) => {
+            let tableValue = response.map((item) => {
+                return {
+                    key: item.key,
+                    value: item.value ?? 0
+                }
+            })
+            setCustomerCommission(tableValue);
+        })
+    }
+
+    useEffect(() => {
+        viewTopCustomerNumber([moment().subtract(180, 'days'), moment()]);
+        viewTopCustomerCommission([moment().subtract(1, 'years'), moment()])
+    }, [])
+
     return (
         <Card title="Customer Statistics">
             <Title level={4}>Top 5 customers of ticket number</Title>
-            <Column {...columnConfig}
-                    data={testTicket}
-                    meta={{uid: {alias: 'User ID'}, sum: {alias: 'Ticket Number'}}} />
+            <RangePicker
+                onChange={handleDateRangeChange(viewTopCustomerNumber)}
+                defaultValue={[moment().subtract(180, 'days'), moment()]}
+            />
+            <p></p>
+            {customerTicketCount ? <Column {...columnConfig}
+                    data={customerTicketCount}
+                    /> : null}
             <Divider />
             <Title level={4}>Top 5 customers of total commission</Title>
-            <Column {...columnConfig}
-                    data={testCommission}
-                    meta={{uid: {alias: 'User ID'}, sum: {alias: 'Total Commission'}}} />
+            <RangePicker
+                onChange={handleDateRangeChange(viewTopCustomerCommission)}
+                defaultValue={[moment().subtract(1, 'years'), moment()]}
+            />
+            <p></p>
+            {customerCommission ? <Column {...columnConfig}
+                    data={customerCommission}
+                    /> : null}
         </Card>
     )
 }

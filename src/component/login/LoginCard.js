@@ -2,8 +2,11 @@ import {Card, Form, Input, Button} from 'antd';
 import React, {useState} from "react";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import {useNavigate} from "react-router-dom";
+import {agentLogin, customerLogin, getPermission, staffLoginVerification} from "../../lib/requests";
+import md5 from 'md5';
+import axios from "axios";
 
-export default function LoginCard() {
+export default function LoginCard(props) {
     let navigate = useNavigate();
 
     const [activeTab, setActiveTab] = useState('customer');
@@ -14,8 +17,34 @@ export default function LoginCard() {
     const onFinish = (values) => {
         // loginRequest(values.username, md5(values.password), activeTab)
         console.log(values)
+        const MD5 = md5(values.password);
+        const configure = (tab) => {
+            if (tab == 'customer') {
+                return customerLogin;
+            } else if (tab == 'agent') {
+                return agentLogin;
+            } else if (tab == 'staff') {
+                return staffLoginVerification;
+            }
+        }
+
+        configure(activeTab)(values.username, MD5).then((response) => {
+            if (response.status == '200') {
+                return response.data;
+            }
+        }).then((response) => {
+            if (response) {
+                console.log(props.uploader);
+                if (activeTab == 'staff') props.uploader({username: values.username + "@" + response})
+                else props.uploader({username: values.username});
+                navigate("/" + activeTab, {replace: true});
+                return;
+            } else {
+                alert("Username or password is incorrect, please try again.");
+            }
+        })
         // eslint-disable-next-line no-restricted-globals
-        navigate("/" + activeTab, {replace: true})
+
     }
 
     const tabList = [
@@ -26,7 +55,7 @@ export default function LoginCard() {
 
     const usernameMessage = {
         customer: "E-mail",
-        agent: "E-mail",
+        agent: "Agent UUID",
         staff: "Username"
     }
 

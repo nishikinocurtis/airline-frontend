@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = "http://localhost:2330/";
+const baseURL = "http://localhost:2130/";
 const config = {
     method: 'post',
     baseURL: baseURL,
@@ -49,8 +49,8 @@ export function createOrder(email, flightNum, airlineName, agentId="") {
 export function agentRegistration(email, pwdHash) {
     let localConfig = Object.assign({}, config, {
         data: {
-            vId: email,
-            vPassword: pwdHash,
+            vid: email,
+            vpassword: pwdHash,
         },
         url: "/create-agent",
     })
@@ -61,8 +61,8 @@ export function agentRegistration(email, pwdHash) {
 export function customerLogin(email, pwdHash) {
     let localConfig = Object.assign({}, config, {
         data: {
-            vId: email,
-            vPassword: pwdHash,
+            vid: email,
+            vpassword: pwdHash,
         },
         url: "/customer/verification",
     })
@@ -73,6 +73,9 @@ export function viewCustomerFlights(email) {
     let localConfig = Object.assign({}, config, {
         data: email,
         url: "/customer/view-my-flights",
+        headers: {
+            'Content-Type': 'text/plain'
+        }
     })
     return axios.request(localConfig);
 }
@@ -90,7 +93,7 @@ export function trackCustomerSpending(email, dateList) {
             key: email,
             data: dateRangeData,
         },
-        url: "/customer/verification",
+        url: "/customer/track-spending",
     });
     return axios.request(localConfig);
 }
@@ -99,27 +102,36 @@ export function trackCustomerSpending(email, dateList) {
 export function agentLogin(email, hashPwd) {
     let localConfig = Object.assign({}, config, {
         data: {
-            vId: email,
-            vPassword: hashPwd,
+            vid: email,
+            vpassword: hashPwd,
         },
         url: "/agent/verification",
     });
     return axios.request(localConfig);
 }
 
-export function viewAgentFlights(bookingAgentId) {
+export function viewAgentFlights(bookingAgentId, dateFrom, dateTo) {
     let localConfig = Object.assign({}, config, {
-        data: bookingAgentId,
+        data: {
+            bookingAgentId: bookingAgentId,
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+        },
         url: "/agent/view-my-flights",
     });
     return axios.request(localConfig);
 }
 
-export function viewCommission(bookingAgentId) {
+export function viewCommission(bookingAgentId, dateFrom, dateTo) {
     let localConfig = Object.assign({}, config, {
-        data: bookingAgentId,
+        data: {
+            bookingAgentId: bookingAgentId,
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+        },
         url: "/agent/view-commission",
     });
+    console.log(localConfig);
     return axios.request(localConfig);
 }
 
@@ -151,8 +163,8 @@ export function viewCustomersByNumber(bookingAgentId, dateFrom, dateTo) {
 export function staffLoginVerification(username, hashPwd) {
     let localConfig = Object.assign({}, config, {
         data: {
-            vId: username,
-            vPassword: hashPwd,
+            vid: username,
+            vpassword: hashPwd,
         },
         url: "/staff/verification",
     })
@@ -163,6 +175,10 @@ export function getPermission(username) {
     let localConfig = Object.assign({}, config, {
         data: username,
         url: "/staff/get-permission",
+        headers: {
+            'Content-Type': 'text/plain'
+        }
+
     })
     return axios.request(localConfig);
 }
@@ -174,8 +190,9 @@ export function staffViewFlights(airlineName, dateFrom, dateTo) {
             dateFrom: dateFrom,
             dateTo: dateTo,
         },
-        url: "/staff/get-permission",
+        url: "/staff/view-flights",
     })
+    console.log(localConfig);
     return axios.request(localConfig);
 }
 
@@ -187,7 +204,8 @@ export function viewCustomersOnFlight(flightNum) {
     return axios.request(localConfig);
 }
 
-export function createFlight(airlineName, flightNum, deptPort, arriPort, status, airplaneId, deptTime, arriTime, price) {
+export function createFlight(values) {
+    const {airlineName, flightNum, deptPort, arriPort, status, airplaneId, deptTime, arriTime, price} = values;
     let localConfig = Object.assign({}, config, {
         data: {
             airlineName: airlineName,
@@ -198,7 +216,7 @@ export function createFlight(airlineName, flightNum, deptPort, arriPort, status,
             airplaneId: airplaneId,
             departureTime: deptTime,
             arrivalTime: arriTime,
-            price: price,
+            price: parseFloat(price),
         },
         url: "/staff/create-flight",
     });
@@ -223,12 +241,13 @@ export function changeFlight(airlineName, flightNum, deptPort="", arriPort="", s
     return axios.request(localConfig);
 }
 
-export function createAirplane(airlineName, airplaneId, seats) {
+export function createAirplane(values) {
+    const {airlineName, airplaneId, seats} = values;
     let localConfig = Object.assign({}, config, {
         data: {
             airlineName: airlineName,
             airplaneId: airplaneId,
-            seats: seats,
+            seats: parseInt(seats),
         },
         url: "/staff/create-airplane",
     });

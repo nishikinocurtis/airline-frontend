@@ -1,11 +1,12 @@
 import {CarryOutOutlined, FundViewOutlined, SendOutlined, SettingOutlined, UserOutlined} from "@ant-design/icons";
 import {Menu} from "antd";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {getPermission} from "../../lib/requests";
 
 const {SubMenu} = Menu;
 
-export default function StaffSidebar({updateSelection}) {
+export default function StaffSidebar(props) {
     const tagList = {
         // Flight Management
         "1": "View flights",
@@ -31,12 +32,23 @@ export default function StaffSidebar({updateSelection}) {
             // clear local account information
             navigate("/", {replace: true})
         }
-        updateSelection(tagList[item.key])
+        props.updateSelection(tagList[item.key])
     }
 
+    const [permissions, setPermissions] = useState([]);
+
     useEffect(() => {
-        updateSelection("Sale report");
-    }, [])
+        console.log(props.username.split('@')[0]);
+        getPermission(props.username.split('@')[0]).then((response) => {
+            if (response.status == '200') {
+                return response.data;
+            }
+            return [];
+        }).then((response) => {
+            console.log(response)
+            setPermissions(response);
+        });
+    }, [props])
 
     return (
         <Menu
@@ -48,10 +60,10 @@ export default function StaffSidebar({updateSelection}) {
         >
             <SubMenu key="sub1" icon={<SendOutlined />} title="Flight Management">
                 <Menu.Item key="1">{tagList['1']}</Menu.Item>
-                <Menu.Item key="2">{tagList['2']}</Menu.Item>
-                <Menu.Item key="3">{tagList['3']}</Menu.Item>
-                <Menu.Item key="4">{tagList['4']}</Menu.Item>
-                <Menu.Item key="5" disabled={false}>{tagList['5']}</Menu.Item>
+                <Menu.Item key="2" disabled={permissions.indexOf('admin') == -1}>{tagList['2']}</Menu.Item>
+                <Menu.Item key="3" disabled={permissions.indexOf('admin') == -1 && permissions.indexOf('operator') == -1}>{tagList['3']}</Menu.Item>
+                <Menu.Item key="4" disabled={permissions.indexOf('admin') == -1}>{tagList['4']}</Menu.Item>
+                <Menu.Item key="5" disabled={permissions.indexOf('admin') == -1}>{tagList['5']}</Menu.Item>
             </SubMenu>
             <SubMenu key="sub2" icon={<FundViewOutlined />} title="Statistics">
                 <Menu.Item key="6">{tagList['6']}</Menu.Item>
@@ -60,8 +72,8 @@ export default function StaffSidebar({updateSelection}) {
                 <Menu.Item key="9">{tagList['9']}</Menu.Item>
             </SubMenu>
             <SubMenu key="sub3" icon={<SettingOutlined />} title="Operation">
-                <Menu.Item key="10" disabled={true}>{tagList['10']}</Menu.Item>
-                <Menu.Item key="11">{tagList['11']}</Menu.Item>
+                <Menu.Item key="10" disabled={permissions.indexOf('admin') == -1}>{tagList['10']}</Menu.Item>
+                <Menu.Item key="11" disabled={permissions.indexOf('admin') == -1}>{tagList['11']}</Menu.Item>
                 <Menu.Item key="12">{tagList['12']}</Menu.Item>
             </SubMenu>
         </Menu>

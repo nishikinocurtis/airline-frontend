@@ -1,10 +1,16 @@
 import React, {useEffect, useState} from "react";
 import {Pie} from "@ant-design/charts";
-import {Card} from "antd";
+import {Card, DatePicker, Divider} from "antd";
+import {trackCustomerSpending} from "../../lib/requests";
+import moment from "moment";
+import {dateFormat, dateTimeFormat} from "../../lib/dateFormat";
 
-export default function SpendingChart() {
+export default function SpendingChart(props) {
 
     const [spendingData, setSpendingData] = useState(null);
+    const [dateRange, setDateRange] = useState(moment().subtract(6, 'month'));
+
+    const handleChange = (date) => setDateRange(date);
 
     //for testing ONLY
     const testData = [
@@ -34,9 +40,41 @@ export default function SpendingChart() {
         },
     ];
 
+    useEffect(() => {
+        const dateList = [];
+        let currentPtr = dateRange;
+        while (currentPtr.endOf("month").format(dateFormat) != moment().endOf("month").format(dateFormat)) {
+            dateList.push({
+                dateFrom: currentPtr.startOf("month").format(dateFormat) + " 00:00:00",
+                dateTo: currentPtr.endOf("month").format(dateFormat) + " 23:59:59"
+            });
+            currentPtr = currentPtr.endOf("month").add(1, 'day');
+        }
+        dateList.push({
+            dateFrom: currentPtr.format(dateFormat) + " 00:00:00",
+            dateTo: moment().format(dateTimeFormat)
+        })
+        trackCustomerSpending(props.username, dateList).then((response) => {
+            if (response.status == '200') {
+                return response.data
+            }
+            return [];
+        }).then((response) => {
+
+            let tableData = response.map((item) => {
+                return {
+                    type: item.dateFrom.split(' ')[0] + " to " + item.dateTo.split(' ')[0],
+                    value: item.value ? item.value : 0
+                }
+            });
+            console.log(tableData);
+            setSpendingData(tableData);
+        })
+    }, []);
+
     const chartConfig = {
         appendPadding: 10,
-        data: testData, // TODO: use props or ask for the server
+        data: spendingData,
         angleField: 'value',
         colorField: 'type',
         radius: 0.9,
@@ -46,7 +84,7 @@ export default function SpendingChart() {
             },
             value: {
                 alias: 'Total Spending',
-                formatter: (v) => ("$" + v.toString()),
+                formatter: (v) => ("RMB " + v.toString()),
             },
         },
         label: {
@@ -56,8 +94,10 @@ export default function SpendingChart() {
     }
 
     return (
-        <Card title="See your amazing trips, Username!">
-            <Pie {...chartConfig} />
+        <Card title={"See your amazing trips, " + props.username + "!"}>
+            <DatePicker defaultValue = {moment()} format={dateFormat} onChange={handleChange} style={{width:200}} />
+            <Divider />
+            {spendingData ? <Pie {...chartConfig} /> : null}
         </Card>
     )
 }

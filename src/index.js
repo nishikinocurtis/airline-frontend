@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import HomePage from "./homepage";
@@ -13,14 +13,25 @@ import {Routes} from "react-router-dom";
 import UserPage from "./page/UserPage";
 
 function App() {
+    const [username, setUsername] = useState("");
+    const [permissions, setPermissions] = useState([]);
+
+    const updateProps = (uploaded) => {
+        console.log(uploaded);
+        setUsername(uploaded.username);
+        if (uploaded.permissions) {
+            setPermissions(uploaded.permissions);
+        }
+    }
+
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/customer" element={<UserPage initializingTab='customer'/>} />
-                <Route path="/agent" element={<UserPage initializingTab='agent'/> } />
-                <Route path="/staff" element={<UserPage initializingTab='staff'/> } />
+                <Route path="/login" element={<LoginPage uploader={updateProps}/>} />
+                <Route path="/customer" element={<UserPage initializingTab='customer' username={username}/>} />
+                <Route path="/agent" element={<UserPage initializingTab='agent' username={username}/> } />
+                <Route path="/staff" element={<UserPage initializingTab='staff' username={username} permissions={permissions}/> } />
             </Routes>
         </Router>
     )

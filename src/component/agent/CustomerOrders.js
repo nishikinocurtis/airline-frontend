@@ -1,8 +1,8 @@
 import {agentInterfaceColumns} from "../../lib/flightData";
 import ViewFlights from "../customer/ViewFlights";
 
-export default function CustomerOrders() {
+export default function CustomerOrders(props) {
     return (
-        <ViewFlights columns={agentInterfaceColumns} />
+        <ViewFlights username={props.username} columns={agentInterfaceColumns} type={"agent"}/>
     )
 }

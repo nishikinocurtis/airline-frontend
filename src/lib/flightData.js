@@ -5,32 +5,43 @@ import React from "react";
 export const ticketColumns = [
     {
         title: "Ticket No.",
-        dataIndex: "ticket_id",
+        dataIndex: "ticketId",
         key: "ticket"
     },
     {
+        title: "Airline",
+        dataIndex: "airlineName",
+        key: "airline"
+    },
+    {
         title: "Flight No.",
-        dataIndex: "flight_id",
+        dataIndex: "flightNum",
         key: "flight"
     },
     {
+        title: "Price",
+        dataIndex: "price",
+        key: "price",
+        sorter: (a, b) => a.price - b.price,
+    },
+    {
         title: "Dept. Airport",
-        dataIndex: "dept",
+        dataIndex: "deptPort",
         key: "dept"
     },
     {
         title: "Arri. Airport",
-        dataIndex: "arri",
+        dataIndex: "arriPort",
         key: "arri"
     },
     {
         title: "Dept. Time",
-        dataIndex: "dept_time",
+        dataIndex: "deptTime",
         key: "dept_time"
     },
     {
         title: "Arri. Time",
-        dataIndex: "arri_time",
+        dataIndex: "arriTime",
         key: "arri_time"
     },
     {
@@ -39,11 +50,10 @@ export const ticketColumns = [
         key: "status",
         render: tags => (
             <>
-                {tags.map(status => (
-                    <Tag color={statusColor[status]} key={status}>
-                        {status.toUpperCase()}
+                {
+                    <Tag color={statusColor[tags]} key={tags}>
+                        {tags.toUpperCase()}
                     </Tag>
-                ))
                 }
             </>
         )
@@ -53,33 +63,39 @@ export const ticketColumns = [
 export const customerInterfaceColumns = [
     {
         title: "Flight No.",
-        dataIndex: "flight_id",
+        dataIndex: "flightNum",
         key: "flight"
     },
     {
+        title: "Airplane",
+        dataIndex: "airplaneId",
+        key: "airplane"
+    },
+    {
         title: "Dept. Airport",
-        dataIndex: "dept",
+        dataIndex: "departurePort",
         key: "dept"
     },
     {
         title: "Arri. Airport",
-        dataIndex: "arri",
+        dataIndex: "arrivalPort",
         key: "arri"
     },
     {
         title: "Dept. Time",
-        dataIndex: "dept_time",
+        dataIndex: "departureTime",
         key: "dept_time"
     },
     {
         title: "Arri. Time",
-        dataIndex: "arri_time",
+        dataIndex: "arrivalTime",
         key: "arri_time"
     },
     {
         title: "Price",
         dataIndex: "price",
-        key: "price"
+        key: "price",
+        sorter: (a, b) => a.price - b.price,
     },
     {
         title: "Status",
@@ -87,11 +103,10 @@ export const customerInterfaceColumns = [
         key: "status",
         render: tags => (
             <>
-                {tags.map(status => (
-                    <Tag color={statusColor[status]} key={status}>
-                        {status.toUpperCase()}
+                {
+                    <Tag color={statusColor[tags]} key={tags}>
+                        {tags.toUpperCase()}
                     </Tag>
-                ))
                 }
             </>
         )
@@ -101,7 +116,7 @@ export const customerInterfaceColumns = [
         key: 'action',
         render: (text, record) => (
             <Space size={"middle"}>
-                <Button disabled={record.status==("finished"||"onBoarding")}>Book {record.flight_id}</Button>
+                <Button disabled={record.status==("finished"||"onBoarding")}>Book {record.flightNum}</Button>
             </Space>
         )
     }
@@ -110,32 +125,32 @@ export const customerInterfaceColumns = [
 export const agentInterfaceColumns = [
     {
         title: "User ID",
-        dataIndex: 'uid',
+        dataIndex: 'email',
         key: 'uid',
     },
     {
         title: "Flight No.",
-        dataIndex: "flight_id",
+        dataIndex: "flightNum",
         key: "flight"
     },
     {
         title: "Dept. Airport",
-        dataIndex: "dept",
+        dataIndex: "deptPort",
         key: "dept"
     },
     {
         title: "Arri. Airport",
-        dataIndex: "arri",
+        dataIndex: "arriPort",
         key: "arri"
     },
     {
         title: "Dept. Time",
-        dataIndex: "dept_time",
+        dataIndex: "deptTime",
         key: "dept_time"
     },
     {
         title: "Arri. Time",
-        dataIndex: "arri_time",
+        dataIndex: "arriTime",
         key: "arri_time"
     },
     {
@@ -149,11 +164,11 @@ export const agentInterfaceColumns = [
         key: "status",
         render: tags => (
             <>
-                {tags.map(status => (
-                    <Tag color={statusColor[status]} key={status}>
-                        {status.toUpperCase()}
+                {
+                    <Tag color={statusColor[tags]} key={tags}>
+                        {tags.toUpperCase()}
                     </Tag>
-                ))
+
                 }
             </>
         )

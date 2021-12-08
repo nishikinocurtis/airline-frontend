@@ -1,6 +1,6 @@
-import {FlightsResultTable} from "./SearchFlights";
+import {customerInterfaceColumns} from "../../lib/flightData";
 import React, {useState} from "react";
-import {Button, Card, DatePicker, Divider, Input, Select} from "antd";
+import {Button, Card, DatePicker, Divider, Input, Select, Table} from "antd";
 import {SwapOutlined} from "@ant-design/icons";
 import {dateFormat} from "../../lib/dateFormat";
 
@@ -20,31 +20,10 @@ export default function PurchaseTicket() {
     const [flightID, setFlightID] = useState(undefined);
 
     //for testing ONLY
-    const test = () => {setSearchResult(["Shanghai", "Shangrao", "Bashang", "SHA", "PVG", "SQD", "ZQZ"])};
+    // const test = () => {setSearchResult(["Shanghai", "Shangrao", "Bashang", "SHA", "PVG", "SQD", "ZQZ"])};
 
     const options = searchResult.map(item => <Option key={item}>{item}</Option>);
 
-    const handleSearch = (value) => {
-        if (value) {
-            setTimeout(test, 500);
-        } else {
-            setSearchResult([]);
-        }
-    }
-    const handleChange = (callBack) => (value) => {
-        callBack(value);
-    }
-
-    const swapDeptArri = () => {
-        let tmp = deptAirport;
-        setDeptAirport(arriAirport);
-        setArriAirport(tmp);
-    }
-
-    const handleSearchFlights = () => {
-        // search flights
-        setFlightResult("testing");
-    }
 
     const handleExactSearch = () => {
         setFlightResult("testing");
@@ -53,45 +32,8 @@ export default function PurchaseTicket() {
 
     return (
         <Card title="Start planning your journey, Username!">
-            <Input.Group>
-                <b>From:</b>
-                <Select
-                    showSearch
-                    addonBefore="From"
-                    style={{width: 300, padding: 10}}
-                    placeholder={"Departure Airport"}
-                    value={deptAirport}
-                    defaultActiveFirstOption={false}
-                    showArrow={false}
-                    filterOption={false}
-                    onSearch={handleSearch}
-                    onChange={handleChange(setDeptAirport)}
-                    notFoundContent={null}
-                >
-                    {options}
-                </Select>
-                <Button shape="circle" icon={<SwapOutlined />} onClick={swapDeptArri} />
-                <b style={{paddingLeft: 10}}>To:</b>
-                <Select
-                    showSearch
-                    addonBefore="To"
-                    style={{width: 300, padding: 10}}
-                    placeholder={"Arrival Airport"}
-                    value={arriAirport}
-                    defaultActiveFirstOption={false}
-                    showArrow={false}
-                    filterOption={false}
-                    onSearch={handleSearch}
-                    onChange={handleChange(setArriAirport)}
-                    notFoundContent={null}
-                >
-                    {options}
-                </Select>
-                <DatePicker format={dateFormat} onChange={handleChange(setDeptDate)} style={{width:200}} />
-                <span style={{padding: 10}}> </span>
-                <Button type="primary" onClick={handleSearchFlights}>Search</Button>
-            </Input.Group>
-            <p>Or use exact searching:</p>
+
+            <p>Use exact searching:</p>
             <Input
                 addonBefore="Flight Number"
                 placeholder="Airline Code + Digits"
@@ -104,7 +46,7 @@ export default function PurchaseTicket() {
             <Button type={"primary"} onClick={handleExactSearch}>Exact Searching</Button>
 
             <Divider />
-            {flightsResult ? <FlightsResultTable data={flightsResult} /> : null}
+            {flightsResult ? <Table columns={customerInterfaceColumns} dataSource={flightsResult} /> : null}
         </Card>
     )
 }

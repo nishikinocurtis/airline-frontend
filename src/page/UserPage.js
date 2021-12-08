@@ -13,11 +13,15 @@ import CustomerOrders from "../component/agent/CustomerOrders";
 import CommissionStatistics from "../component/agent/CommissionStatistics";
 import StaffSidebar from "../component/staff/StaffSidebar";
 import EditAirport from "../component/staff/EditAirport";
+import StaffViewFlights from "../component/staff/StaffViewFlights";
+import CreateFlight from "../component/staff/CreateFlight";
+import FlipStatus from "../component/staff/FlipStatus";
+import CreateAirplane from "../component/staff/CreateAirplane";
 
 const {Header, Content, Sider, Footer} = Layout;
 const {SubMenu} = Menu;
 
-export default function UserPage({initializingTab}) {
+export default function UserPage({initializingTab, username, permissions}) {
     let navigate = useNavigate();
 
     const [navigateBar, setNavigateBar] = useState("customer");
@@ -31,19 +35,23 @@ export default function UserPage({initializingTab}) {
     const sidebarList = {
         customer: <CustomerSidebar updateSelection={setSidebar}/>,
         agent: <AgentSidebar updateSelection={setSidebar}/>,
-        staff: <StaffSidebar updateSelection={setSidebar}/>,
+        staff: <StaffSidebar updateSelection={setSidebar} username={username} permissons={permissions}/>,
     }
 
     const userContent = {
-        "My flights": <ViewFlights />,
-        "Search flights": <SearchFlights />,
-        "Purchase tickets": <PurchaseTicket />,
-        "Track spending": <SpendingChart />,
-        "Top customers": <TopCustomerChart />,
+        "My flights": <ViewFlights username={username}/>,
+        "Search flights": <SearchFlights username={username}/>,
+        "Purchase tickets": <PurchaseTicket username={username}/>,
+        "Track spending": <SpendingChart username={username}/>,
+        "Top customers": <TopCustomerChart username={username}/>,
         "Create order": <PurchaseTicket />,
-        "My customer orders": <CustomerOrders />,
-        "Commission statistics": <CommissionStatistics />,
-        "Add airport": <EditAirport />,
+        "My customer orders": <CustomerOrders username={username}/>,
+        "Commission statistics": <CommissionStatistics username={username}/>,
+        "Add airport": <EditAirport username={username}/>,
+        "View flights": <StaffViewFlights username={username}/>,
+        "Create flight": <CreateFlight username={username}/>,
+        "Change flight status": <FlipStatus username={username}/>,
+        "Add airplane": <CreateAirplane username={username}/>
     }
 
     useEffect(() => {
