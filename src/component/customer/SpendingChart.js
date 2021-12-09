@@ -12,33 +12,6 @@ export default function SpendingChart(props) {
 
     const handleChange = (date) => setDateRange(date);
 
-    //for testing ONLY
-    const testData = [
-        {
-            type: 'January',
-            value: 2930.8,
-        },
-        {
-            type: 'February',
-            value: 1034.2,
-        },
-        {
-            type: 'March',
-            value: 3832.9,
-        },
-        {
-            type: 'April',
-            value: 1564.0,
-        },
-        {
-            type: 'May',
-            value: 3013.6,
-        },
-        {
-            type: 'June',
-            value: 4566.2,
-        },
-    ];
 
     useEffect(() => {
         const dateList = [];

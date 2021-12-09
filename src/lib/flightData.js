@@ -175,3 +175,55 @@ export const agentInterfaceColumns = [
     },
 ]
 
+export const airlineInterfaceColumns = [
+    {
+        title: "Ticket ID",
+        dataIndex: 'ticketId',
+        key: 'uid',
+    },
+    {
+        title: "Flight No.",
+        dataIndex: "flightNum",
+        key: "flight"
+    },
+    {
+        title: "Dept. Airport",
+        dataIndex: "deptPort",
+        key: "dept"
+    },
+    {
+        title: "Arri. Airport",
+        dataIndex: "arriPort",
+        key: "arri"
+    },
+    {
+        title: "Dept. Time",
+        dataIndex: "deptTime",
+        key: "dept_time"
+    },
+    {
+        title: "Arri. Time",
+        dataIndex: "arriTime",
+        key: "arri_time"
+    },
+    {
+        title: "Price",
+        dataIndex: "price",
+        key: "price"
+    },
+    {
+        title: "Status",
+        dataIndex: "status",
+        key: "status",
+        render: tags => (
+            <>
+                {
+                    <Tag color={statusColor[tags]} key={tags}>
+                        {tags.toUpperCase()}
+                    </Tag>
+
+                }
+            </>
+        )
+    },
+]

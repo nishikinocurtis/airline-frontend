@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {dateTimeFormat} from "./dateFormat";
 
 const baseURL = "http://localhost:2130/";
 const config = {
@@ -220,10 +221,12 @@ export function createFlight(values) {
         },
         url: "/staff/create-flight",
     });
+    console.log(localConfig);
     return axios.request(localConfig);
 }
 
-export function changeFlight(airlineName, flightNum, deptPort="", arriPort="", status, airplaneId="", deptTime="", arriTime="", price="") {
+export function changeFlight(values) {
+    const {airlineName, flightNum, deptPort, arriPort, status, airplaneId, deptTime, arriTime, price} = values
     let localConfig = Object.assign({}, config, {
         data: {
             airlineName: airlineName,
@@ -254,7 +257,8 @@ export function createAirplane(values) {
     return axios.request(localConfig);
 }
 
-export function createAirport(name, city) {
+export function createAirport(values) {
+    const {name, city} = values;
     let localConfig = Object.assign({}, config, {
         data: {
             name: name,
@@ -381,7 +385,19 @@ export function viewTopDestinations(airlineName, dateList, limit=3) {
         },
         url: "/staff/destinations",
     });
+    console.log(localConfig);
     return axios.request(localConfig)
+}
+
+export function addAffiliation(username, af) {
+    let localConfig = Object.assign({}, config, {
+        data: {
+            key: username,
+            value: af,
+        },
+        url: "/staff/add-agent",
+    });
+    return axios.request(localConfig);
 }
 
 export function grantPermission(username, permission) {

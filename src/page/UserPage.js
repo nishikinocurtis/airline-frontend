@@ -17,6 +17,13 @@ import StaffViewFlights from "../component/staff/StaffViewFlights";
 import CreateFlight from "../component/staff/CreateFlight";
 import FlipStatus from "../component/staff/FlipStatus";
 import CreateAirplane from "../component/staff/CreateAirplane";
+import TopAgentChart from "../component/staff/TopAgentChart";
+import FrequentCustomer from "../component/staff/FrequentCustomer";
+import TopDestination from "../component/staff/TopDestination";
+import RevenueComparison from "../component/staff/RevenueComparison";
+import SalesReport from "../component/staff/SalesReport";
+import AddBookingAgent from "../component/staff/AddBookingAgent";
+import PermissionManagement from "../component/staff/PermissionManagement";
 
 const {Header, Content, Sider, Footer} = Layout;
 const {SubMenu} = Menu;
@@ -51,7 +58,14 @@ export default function UserPage({initializingTab, username, permissions}) {
         "View flights": <StaffViewFlights username={username}/>,
         "Create flight": <CreateFlight username={username}/>,
         "Change flight status": <FlipStatus username={username}/>,
-        "Add airplane": <CreateAirplane username={username}/>
+        "Add airplane": <CreateAirplane username={username}/>,
+        "Top agents": <TopAgentChart username={username}/>,
+        "Frequent customers": <FrequentCustomer username={username}/>,
+        "Top destinations": <TopDestination username={username}/>,
+        "Revenue comparison": <RevenueComparison username={username}/>,
+        "Sale report": <SalesReport username={username}/>,
+        "Add booking agent": <AddBookingAgent username={username}/>,
+        "Grant permission": <PermissionManagement username={username}/>
     }
 
     useEffect(() => {

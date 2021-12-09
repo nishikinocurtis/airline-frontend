@@ -1,18 +1,22 @@
-import {Card, Form, Input, Button, DatePicker} from 'antd';
+import {Card, Form, Input, Button, DatePicker, message} from 'antd';
 import React, {useState} from "react";
 
 import {agentLogin, createFlight, customerLogin, getPermission, staffLoginVerification} from "../../lib/requests";
+import {dateTimeFormat} from "../../lib/dateFormat";
 
 export default function CreateFlight(props) {
 
     const onFinish = (values) => {
-        createFlight(values).then((response) => {
+        let body = values;
+        body['deptTime'] = body['deptTime'].format(dateTimeFormat);
+        body['arriTime'] = body['arriTime'].format(dateTimeFormat);
+        createFlight(body).then((response) => {
             if (response.status == '200') {
                 return response.data;
             }
         }).then((response) => {
             if (response) {
-                alert("Created Successfully!")
+                message.success("Created Successfully!")
             }
         })
     }
@@ -36,24 +40,24 @@ export default function CreateFlight(props) {
                     <Input placeholder="Flight No." />
                 </Form.Item>
                 <Form.Item
-                    name="departurePort"
+                    name="deptPort"
                     rules={[{required: true, message: "Please input departurePort"}]}>
                     <Input placeholder="departurePort" />
                 </Form.Item>
                 <Form.Item
-                    name="departureTime"
+                    name="deptTime"
                     rules={[{required: true, message: "Please select departureTime"}]}>
-                    <DatePicker showTime/>
+                    <DatePicker showTime format={dateTimeFormat}/>
                 </Form.Item>
                 <Form.Item
-                    name="arrivalPort"
+                    name="arriPort"
                     rules={[{required: true, message: "Please input arrivalPort"}]}>
                     <Input placeholder="arrivalPort" />
                 </Form.Item>
                 <Form.Item
                     name="arriTime"
                     rules={[{required: true, message: "Please select arrivalTime"}]}>
-                    <DatePicker showTime/>
+                    <DatePicker showTime format={dateTimeFormat}/>
                 </Form.Item>
                 <Form.Item
                     name="airplaneId"

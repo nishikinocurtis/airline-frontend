@@ -1,14 +1,16 @@
-import {Input, Space, DatePicker, Select, Card, Button, Divider, Tag, Table} from 'antd';
+import {Input, Space, DatePicker, Select, Card, Button, Divider, Tag, Table, Modal, Form, message} from 'antd';
 import React, {useState} from "react";
 import {SwapOutlined} from "@ant-design/icons";
 import {statusColor} from "../../lib/statusTag";
 import {dateFormat} from "../../lib/dateFormat";
 import {customerInterfaceColumns} from "../../lib/flightData";
-import {searchFlights, searchAirport} from "../../lib/requests";
+import {searchFlights, searchAirport, createOrder} from "../../lib/requests";
 import moment from "moment";
 
 const {Search} = Input;
 const {Option} = Select;
+
+
 
 
 export default function SearchFlights(props) {
@@ -17,6 +19,7 @@ export default function SearchFlights(props) {
     // {cities if city, airports if airport}, ...,
     // {airports if city, cities if airport}, {}]
 
+
     const [deptAirport, setDeptAirport] = useState(undefined);
     const [arriAirport, setArriAirport] = useState(undefined);
     const [deptDate, setDeptDate] = useState(moment()); //today
@@ -24,6 +27,95 @@ export default function SearchFlights(props) {
     const [secondSearchResult, setSecondSearchResult] = useState([]);
     const [flightsResult, setFlightResult] = useState(null);
     const [tableLoading, setTableLoading] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [target, setTarget] = useState("");
+    const [confirmLoading, setConfirmLoading] = useState(false);
+
+    const handleClick = (value) => () => {
+        setTarget(value);
+        setIsModalVisible(true);
+    }
+
+    const handleFinish = (values) => {
+        createOrder(values.email, values.flightNum, values.airlineName, values.agentId).then((response) => {
+            if (response.status == '200') {
+                return response.data;
+            }
+        }).then((response) => {
+            if (response.indexOf("Error") > -1) {
+                message.error("Creating order failed" + response);
+            } else {
+                message.success("Created Successfully");
+                setIsModalVisible(false);
+                setConfirmLoading(false);
+            }
+        })
+    }
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    }
+
+    const innerCustomerInterfaceColumns = [
+        {
+            title: "Flight No.",
+            dataIndex: "flightNum",
+            key: "flight"
+        },
+        {
+            title: "Airplane",
+            dataIndex: "airplaneId",
+            key: "airplane"
+        },
+        {
+            title: "Dept. Airport",
+            dataIndex: "departurePort",
+            key: "dept"
+        },
+        {
+            title: "Arri. Airport",
+            dataIndex: "arrivalPort",
+            key: "arri"
+        },
+        {
+            title: "Dept. Time",
+            dataIndex: "departureTime",
+            key: "dept_time"
+        },
+        {
+            title: "Arri. Time",
+            dataIndex: "arrivalTime",
+            key: "arri_time"
+        },
+        {
+            title: "Price",
+            dataIndex: "price",
+            key: "price",
+            sorter: (a, b) => a.price - b.price,
+        },
+        {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: tags => (
+                <>
+                    {
+                        <Tag color={statusColor[tags]} key={tags}>
+                            {tags.toUpperCase()}
+                        </Tag>
+                    }
+                </>
+            )
+        },
+        {
+            title: "Action",
+            key: 'action',
+            render: (text, record) => (
+                <Space size={"middle"}>
+                    <Button onClick={handleClick(record.flightNum)} disabled={record.status==("finished"||"onBoarding")}>Book {record.flightNum}</Button>
+                </Space>
+            )
+        }
+    ];
 
     //for testing ONLY
     // const test = () => {setSearchResult(["Shanghai", "Shangrao", "Bashang", "SHA", "PVG", "SQD", "ZQZ"])};
@@ -106,47 +198,90 @@ export default function SearchFlights(props) {
     }
 
     return (
-        <Card title={"Start planning your journey, " + props.username + "!"}>
-            <Input.Group>
-                <b>From:</b>
-                <Select
-                    showSearch
-                    addonBefore="From"
-                    style={{width: 300, padding: 10}}
-                    placeholder={"Departure Airport"}
-                    value={deptAirport}
-                    defaultActiveFirstOption={false}
-                    showArrow={false}
-                    filterOption={false}
-                    onSearch={handleSearch(setSearchResult)}
-                    onChange={handleChange(setDeptAirport)}
-                    notFoundContent={null}
+        <>
+            <Card title={"Start planning your journey, " + props.username + "!"}>
+                <Input.Group>
+                    <b>From:</b>
+                    <Select
+                        showSearch
+                        addonBefore="From"
+                        style={{width: 300, padding: 10}}
+                        placeholder={"Departure Airport"}
+                        value={deptAirport}
+                        defaultActiveFirstOption={false}
+                        showArrow={false}
+                        filterOption={false}
+                        onSearch={handleSearch(setSearchResult)}
+                        onChange={handleChange(setDeptAirport)}
+                        notFoundContent={null}
+                    >
+                        {options}
+                    </Select>
+                    <Button shape="circle" icon={<SwapOutlined />} onClick={swapDeptArri} />
+                    <b style={{paddingLeft: 10}}>To:</b>
+                    <Select
+                        showSearch
+                        addonBefore="To"
+                        style={{width: 300, padding: 10}}
+                        placeholder={"Arrival Airport"}
+                        value={arriAirport}
+                        defaultActiveFirstOption={false}
+                        showArrow={false}
+                        filterOption={false}
+                        onSearch={handleSearch(setSecondSearchResult)}
+                        onChange={handleChange(setArriAirport)}
+                        notFoundContent={null}
+                    >
+                        {secondOptions}
+                    </Select>
+                    <DatePicker defaultValue = {moment()} format={dateFormat} onChange={handleChange(setDeptDate)} style={{width:200}} />
+                    <span style={{padding: 10}}> </span>
+                    <Button type="primary" onClick={handleSearchFlights}>Search</Button>
+                </Input.Group>
+                <Divider />
+                {flightsResult ? <Table loading={tableLoading} columns={innerCustomerInterfaceColumns} dataSource={flightsResult} /> : null}
+            </Card>
+            <Modal
+                title={"Book " + target}
+                visible={isModalVisible}
+                confirmLoading={confirmLoading}
+                footer={null}
+            >
+                <Form
+                    name="create-order"
+                    className="create-order"
+                    onFinish={handleFinish}
                 >
-                    {options}
-                </Select>
-                <Button shape="circle" icon={<SwapOutlined />} onClick={swapDeptArri} />
-                <b style={{paddingLeft: 10}}>To:</b>
-                <Select
-                    showSearch
-                    addonBefore="To"
-                    style={{width: 300, padding: 10}}
-                    placeholder={"Arrival Airport"}
-                    value={arriAirport}
-                    defaultActiveFirstOption={false}
-                    showArrow={false}
-                    filterOption={false}
-                    onSearch={handleSearch(setSecondSearchResult)}
-                    onChange={handleChange(setArriAirport)}
-                    notFoundContent={null}
-                >
-                    {secondOptions}
-                </Select>
-                <DatePicker defaultValue = {moment()} format={dateFormat} onChange={handleChange(setDeptDate)} style={{width:200}} />
-                <span style={{padding: 10}}> </span>
-                <Button type="primary" onClick={handleSearchFlights}>Search</Button>
-            </Input.Group>
-            <Divider />
-            {flightsResult ? <Table loading={tableLoading} columns={customerInterfaceColumns} dataSource={flightsResult} /> : null}
-        </Card>
+                    <Form.Item
+                        name="flightNum"
+                        initialValue={target}
+                        rules={[{required: true, message: "Please input Flight No."}]}>
+                        <Input placeholder="Flight No." />
+                    </Form.Item>
+                    <Form.Item
+                        name="airlineName"
+                        rules={[{required: true, message: "Please input Airline Name"}]}>
+                        <Input placeholder="Airline Name" />
+                    </Form.Item>
+                    <Form.Item
+                        name="email"
+                        rules={[{required: true, message: "Please input E-mail"}]}>
+                        <Input placeholder="email" />
+                    </Form.Item>
+                    <Form.Item
+                        name="agentId"
+                    >
+                        <Input placeholder="bookingAgentId(Required for Booking Agents)" />
+                    </Form.Item>
+                    <Form.Item>
+                        <Button onClick={handleCancel} className="login-cancel-button">Cancel</Button>
+                    </Form.Item>
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit" className="login-form-button">Submit</Button>
+                    </Form.Item>
+                </Form>
+            </Modal>
+        </>
+
     )
 }

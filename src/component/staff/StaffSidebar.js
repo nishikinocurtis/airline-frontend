@@ -16,9 +16,10 @@ export default function StaffSidebar(props) {
         "5": "Add airport",
         // Statistics
         "6": "Frequent customers",
-        "7": "Revenue Comparison",
+        "7": "Revenue comparison",
         "8": "Top destinations",
         "9": "Sale report",
+        "13": "Top agents",
         // Operation
         "10": "Add booking agent",
         "11": "Grant permission",
@@ -50,6 +51,10 @@ export default function StaffSidebar(props) {
         });
     }, [props])
 
+    useEffect(() => {
+        props.updateSelection("Sale report")
+    }, [])
+
     return (
         <Menu
             mode="inline"
@@ -70,6 +75,7 @@ export default function StaffSidebar(props) {
                 <Menu.Item key="7">{tagList['7']}</Menu.Item>
                 <Menu.Item key="8">{tagList['8']}</Menu.Item>
                 <Menu.Item key="9">{tagList['9']}</Menu.Item>
+                <Menu.Item key="13">{tagList['13']}</Menu.Item>
             </SubMenu>
             <SubMenu key="sub3" icon={<SettingOutlined />} title="Operation">
                 <Menu.Item key="10" disabled={permissions.indexOf('admin') == -1}>{tagList['10']}</Menu.Item>

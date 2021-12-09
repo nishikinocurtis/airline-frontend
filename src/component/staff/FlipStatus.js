@@ -1,18 +1,29 @@
-import {Card, Form, Input, Button} from 'antd';
+import {Card, Form, Input, Button, message} from 'antd';
 import React, {useState} from "react";
 
-import {agentLogin, createFlight, customerLogin, getPermission, staffLoginVerification} from "../../lib/requests";
+import {
+    agentLogin,
+    changeFlight,
+    createFlight,
+    customerLogin,
+    getPermission,
+    staffLoginVerification
+} from "../../lib/requests";
+import {dateTimeFormat} from "../../lib/dateFormat";
 
 export default function FlipStatus(props) {
 
     const onFinish = (values) => {
-        createFlight(values).then((response) => {
+        let body = values;
+        body['deptTime'] = ""
+        body['arriTime'] = ""
+        changeFlight(values).then((response) => {
             if (response.status == '200') {
                 return response.data;
             }
         }).then((response) => {
             if (response) {
-                alert("Created Successfully!")
+                message.success("Created Successfully!")
             }
         })
     }
@@ -36,12 +47,12 @@ export default function FlipStatus(props) {
                     <Input placeholder="Flight No. (required)" />
                 </Form.Item>
                 <Form.Item
-                    name="departurePort"
+                    name="deptPort"
                     rules={[{required: true, message: "Please input departurePort"}]}>
                     <Input placeholder="departurePort" />
                 </Form.Item>
                 <Form.Item
-                    name="arrivalPort"
+                    name="arriPort"
                     rules={[{required: true, message: "Please input arrivalPort"}]}>
                     <Input placeholder="arrivalPort" />
                 </Form.Item>

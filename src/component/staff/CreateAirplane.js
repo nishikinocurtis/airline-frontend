@@ -1,4 +1,4 @@
-import {Card, Form, Input, Button} from 'antd';
+import {Card, Form, Input, Button, message} from 'antd';
 import React, {useState} from "react";
 import {createAirplane} from "../../lib/requests";
 
@@ -11,7 +11,7 @@ export default function CreateAirplane(props) {
             }
         }).then((response) => {
             if (response) {
-                alert("Created Successfully!")
+                message.success("Created Successfully!")
             }
         })
     }

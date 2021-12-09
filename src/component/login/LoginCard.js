@@ -1,4 +1,4 @@
-import {Card, Form, Input, Button} from 'antd';
+import {Card, Form, Input, Button, message} from 'antd';
 import React, {useState} from "react";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import {useNavigate} from "react-router-dom";
@@ -40,7 +40,7 @@ export default function LoginCard(props) {
                 navigate("/" + activeTab, {replace: true});
                 return;
             } else {
-                alert("Username or password is incorrect, please try again.");
+                message.error("Username or password is incorrect, please try again.");
             }
         })
         // eslint-disable-next-line no-restricted-globals
